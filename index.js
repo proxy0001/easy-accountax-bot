@@ -9,9 +9,6 @@ const app = express();
 
 // 載入 dotenv
 require('dotenv').config();
-(async function () {
-    const sheet = await initGoogleSheet();
-})();
 
 // identify line channel
 const bot = initLinebot();
