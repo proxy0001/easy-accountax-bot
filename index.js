@@ -1,5 +1,6 @@
 // create express server
 const express = require("express");
+const parser = require("parser.js");
 const app = express();
 
 // import linebot SDK
@@ -18,7 +19,10 @@ const linebotParser = bot.parser();
 bot.on("message", function (event) {
     // event.message.text is the msg typing from user
     console.log(event.message.text);
-    event.reply("hello I am Cyber 胖");
+    const data = parser(event.message.text);
+    const replyMsg = `hello I am Cyber Fat, here is your parsed data look like.
+    ${data}`
+    event.reply(replyMsg);
 });
 
 // for line-bot
