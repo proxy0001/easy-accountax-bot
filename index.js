@@ -17,10 +17,11 @@ const linebotParser = bot.parser();
 // when someone send msg to bot
 bot.on("message", function (event) {
     // event.message.text is the msg typing from user
-    console.log(event.message.text)
+    console.log(event.message.text);
+    event.reply("hello I am Cyber 胖");
 });
 
-// send msg to line-bot
+// for line-bot
 app.post("/", linebotParser);
 
 // execute server
