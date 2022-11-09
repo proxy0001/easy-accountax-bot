@@ -42,8 +42,8 @@ app.listen(process.env.PORT || 3000, () => {
 // initialize google sheet
 async function initGoogleSheet () {
     const credentials = {
-        client_email: process.env.GOOGLE_PRIVATE_KEY,
-        private_key: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
+        client_email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
+        private_key: process.env.GOOGLE_PRIVATE_KEY,
     }
     const docId = process.env.GOOGLE_DOC_ID;
     const sheetId = process.env.GOOGLE_SHEET_ID;
