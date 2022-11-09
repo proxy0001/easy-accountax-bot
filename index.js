@@ -1,6 +1,6 @@
 // create express server
 const express = require("express");
-const parser = require("parser.js");
+const parser = require("./parser.js");
 const app = express();
 
 // import linebot SDK
