@@ -4,7 +4,7 @@
   "description": "simple robot for recording your spending",
   "main": "index.js",
   "scripts": {
-    "test": "mocha --exit"
+    "test": "mocha --exit --timeout 15000"
   },
   "repository": {
     "type": "git",
@@ -23,6 +23,7 @@
   },
   "devDependencies": {
     "chai": "^4.3.7",
+    "google-spreadsheet": "^3.3.0",
     "mocha": "^10.1.0"
   }
 }
