@@ -9,6 +9,9 @@ const app = express();
 
 // 載入 dotenv
 require('dotenv').config();
+(async function () {
+    const sheet = await initGoogleSheet();
+})();
 
 // identify line channel
 const bot = initLinebot();
@@ -43,7 +46,7 @@ app.listen(process.env.PORT || 3000, () => {
 async function initGoogleSheet () {
     const credentials = {
         client_email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
-        private_key: process.env.GOOGLE_PRIVATE_KEY,
+        private_key: process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n'),
     }
     const docId = process.env.GOOGLE_DOC_ID;
     const sheetId = process.env.GOOGLE_SHEET_ID;
