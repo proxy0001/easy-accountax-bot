@@ -1,0 +1,24 @@
+{
+  "name": "easy-accountax-bot",
+  "version": "1.0.0",
+  "description": "simple robot for recording your spending",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/proxy0001/easy-accountax-bot.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/proxy0001/easy-accountax-bot/issues"
+  },
+  "homepage": "https://github.com/proxy0001/easy-accountax-bot#readme",
+  "dependencies": {
+    "express": "^4.18.2",
+    "linebot": "^1.6.1"
+  }
+}
