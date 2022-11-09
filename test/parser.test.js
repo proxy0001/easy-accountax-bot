@@ -1,4 +1,4 @@
-const parser = require("../parser.js");
+const parser = require("../utils/parser.js");
 const expect = require("chai").expect;
 
 // a test suite for parser

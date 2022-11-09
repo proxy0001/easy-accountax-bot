@@ -1,4 +1,4 @@
-const { initSheet, addRecord } = require("../sheet.js");
+const { initSheet, addRecord } = require("../utils/sheet.js");
 const expect = require("chai").expect;
 
 var sheet;
