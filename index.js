@@ -25,8 +25,8 @@ bot.on("message", async function (event) {
         amount: data[1],
         createDate: data[2],
     });
-    const replyMsg = `A new record was appended successly.
-${data}`
+    const replyMsg = `Add a record successfully.
+${data.join(', ')}`
     event.reply(replyMsg);
 });
 
