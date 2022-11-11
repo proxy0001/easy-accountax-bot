@@ -1,8 +1,8 @@
 function parser (text) {
     if (!text) return [];
-    const matched = text.match(/(.+) (\d+)/);
+    const matched = text.match(/(.+\D)(\d+)$/);
     if (!matched) return [];
-    const title = matched[1];
+    const title = matched[1].trim();
     const amount = parseInt(matched[2]);
     const createDatetime = formatDatetime(getLocalTime());
     return [title, amount, createDatetime]

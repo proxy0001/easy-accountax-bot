@@ -18,4 +18,10 @@ describe('testing our parser', function () {
         expect(title).to.equal('hel23 lo');
         expect(amount).to.equal(100);
     })
+
+    it('should return any charachters as title, numbers in the end as amount even without space between', function () {
+        const [title, amount, createDatetime] = parser('hel23 lo100');
+        expect(title).to.equal('hel23 lo');
+        expect(amount).to.equal(100);
+    })
 })
