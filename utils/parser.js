@@ -1,6 +1,6 @@
 function parser (text) {
     if (!text) return [];
-    const matched = text.match(/(\D+) (\d+)/);
+    const matched = text.match(/(.+) (\d+)/);
     if (!matched) return [];
     const title = matched[1];
     const amount = parseInt(matched[2]);
