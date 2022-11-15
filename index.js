@@ -7,7 +7,7 @@ const parser = require("./utils/parser.js");
 const { initSheet, addRecord } = require("./utils/sheet.js");
 const app = express();
 
-// 載入 dotenv
+// load dotenv
 require('dotenv').config();
 
 // identify line channel
