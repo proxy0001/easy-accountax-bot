@@ -17,10 +17,20 @@ const processor = (function () {
     const illegal = function (text) {
         return []
     };
+    const matchCoverage = function (matches) {
+        if (matches.length === 0) return 0
+        let matchedLen = 0
+        let matchedStr = ''
+        for(let i = 0; i < matches.length; i++) {
+            matchedLen += matches[i][0].length
+            matchedStr += matches[i][0]
+        }
+        return matchedLen / matches[0]['input'].replace(/\n/g, '').length
+    };
     const extractor = function (text, regExp, titleHandler, collectionHandler) {
         const matches = [...text.trim().matchAll(regExp)];
         if (!matches.length) return illegal();
-        if (matches[0]['index'] !== 0) return illegal();
+        if (matchCoverage(matches) !== 1) return illegal();
         let title = '', collection = [];
         for (const [index, match] of [...matches].entries()) {
             trimedMatch = match.map(x => x && typeof x.trim === 'function' ? x.trim() : x)
@@ -35,6 +45,17 @@ const processor = (function () {
     const oneLineWithEmptyTitle = function (text) {
         return extractor(text, /(\D+)(\d+)/gm, (index, match, title) => '', (index, match, collection) => {
             if (match[2]) collection.push([match[1], match[2]])
+            return collection
+        })
+    };
+    const oneLineWithStrictMode = function (text) {
+        return extractor(text, /^([^ ]*) +([^ ]*\D)(\d+) +|([^ ]*) +(\d+)| +(.*[^ ]*) +(\d+)/gm, (index, match, title) => {
+            return index === 0 && match[1] ? match[1] : title
+        }, (index, match, collection) => {
+            if (index !== 0 && match[1]) collection.push([match[1], ''])
+            if (match[3]) collection.push([match[2], match[3]])
+            if (match[5]) collection.push([match[4], match[5]])
+            if (match[7]) collection.push([match[6], match[7]])
             return collection
         })
     };
@@ -61,6 +82,7 @@ const processor = (function () {
     const executions = {
         illegal,
         oneLineWithEmptyTitle,
+        oneLineWithStrictMode,
         oneLine,
         multiLines,
     };
@@ -88,7 +110,7 @@ const processor = (function () {
 const planner = function (text) {
     if (!text) return 'illegal';
     if (/\r|\n/.exec(text)) return 'multiLines';
-    else return ['oneLine', 'oneLineWithEmptyTitle'];
+    else return ['oneLineWithStrictMode', 'oneLine', 'oneLineWithEmptyTitle'];
 }
 
 const parser = function (text) {

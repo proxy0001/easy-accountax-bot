@@ -70,6 +70,13 @@ describe('support one line', function () {
         expect(amount).to.equal(24);
     })
 
+    it('has title and 3 items, item names have numbers, return title and 3 items, sum of amount of each item', function () {
+        const [title, items, amount, createDatetime] = parser('店家的名字 可樂12 12塊炸雞 120 雞塊*6 120');
+        expect(title).to.equal('店家的名字');
+        expect(items).to.equal(`可樂 12\n12塊炸雞 120\n雞塊*6 120`);
+        expect(amount).to.equal(252);
+    })
+
 });
 
 describe('support multiple lines', function () {
