@@ -2,7 +2,7 @@ const parser = require("../utils/parser.js");
 const expect = require("chai").expect;
 
 // a test suite for parser
-describe('testing our parser', function () {
+describe('support single lines', function () {
     it('should return [] when the input is empty', function () {
         expect(parser('')).to.eql([])
     })
@@ -24,6 +24,14 @@ describe('testing our parser', function () {
         expect(title).to.equal('hel23 lo');
         expect(amount).to.equal(100);
     })
+
+    it('should separate title and items correctly and amount is the sum of items', function () {
+        const [title, items, amount, createDatetime] = parser('adsf11sdf    adfasdf 12 adfadf 12 asdfasdf 2122');
+        expect(title).to.equal('adsf11sdf');
+        expect(items).to.equal(`adfasdf 12\nadfadf 12\nasdfasdf 2122`);
+        expect(amount).to.equal(2146);
+    })
+
 });
 
 describe('support multiple lines', function () {

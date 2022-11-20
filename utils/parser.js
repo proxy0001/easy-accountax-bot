@@ -9,34 +9,46 @@ const formatDatetime = function (datetime) {
     return datetime.toISOString().slice(0, 19).replace(/-/g, "/").replace("T", " ");
 };
 
+const elimiter = ' ', newline = '\n';
+const reduceAmount = [(acc, cur) => cur[1] ? acc + parseInt(cur[1]) : acc, 0]
+const reduceItemsStr = [(acc, cur) => acc ? acc + newline + cur[0] + elimiter + cur[1] : cur[0] + elimiter + cur[1], '']
+
 const processor = (function () {
     const illegal = function (text) {
         return []
     };
-    const singleLine = function (text) {
-        const matched = text.trim().match(/(.+\D)(\d+) *$/);
-        if (!matched) return illegal();
-        const title = matched[1].trim();
-        const amount = parseInt(matched[2]);
+    const extractor = function (text, regExp, titleHandler, collectionHandler) {
+        const matches = text.trim().matchAll(regExp);
+        if (!matches) return illegal();
+        let title = '', collection = [];
+        for (const [index, match] of [...matches].entries()) {
+            trimedMatch = match.map(x => x && x.trim instanceof Function ? x.trim() : x)
+            title = titleHandler(index, trimedMatch, title)
+            collection = collectionHandler(index, trimedMatch, collection)
+        }
+        const amount = collection.reduce(...reduceAmount);
+        const items = collection.reduce(...reduceItemsStr);
         const createDatetime = formatDatetime(getLocalTime());
-        const items = '';
         return [title, items, amount, createDatetime];
     };
+    const singleLine = function (text) {
+        return extractor(text, /^([^ ]*) +(\D*) *(\d+)|(\D*) *(\d+)/g, (index, match, title) => {
+            return index === 0 && match[1] ? match[1].trim() : title
+        }, (index, match, collection) => {
+            if (index !== 0 && match[1]) collection.push([match[1], ''])
+            if (match[3]) collection.push([match[2], match[3]])
+            if (match[5]) collection.push([match[4], match[5]])
+            return collection
+        })
+    };
     const multiLines = function (text) {
-        const matched = text.trim().matchAll(/(.+\D)(\d+) *$|(.*[\D^ *]) *$/gm);
-        if (!matched) return illegal();
-        let title = '', items = '', amount = 0;
-        const elimiter = ' ', newline = '\n';
-        const createDatetime = formatDatetime(getLocalTime());
-        const collection = []
-        for (const [index, match] of [...matched].entries()) {  
-            if (index === 0 && match[3]) title = match[3].trim()
-            if (index !== 0 && match[3]) collection.push([match[3].trim(), ''])
-            if (match[2]) collection.push([match[1].trim(), match[2].trim()])
-        }
-        amount = collection.reduce((acc, cur) => cur[1] ? acc + parseInt(cur[1]) : acc, 0)
-        items = collection.reduce((acc, cur) => acc ? acc + newline + cur[0] + elimiter + cur[1] : cur[0] + elimiter + cur[1], '')
-        return [title, items, amount, createDatetime];
+        return extractor(text, /(.+\D)(\d+) *$|(.*[\D^ *]) *$/gm, (index, match, title) => {
+            return index === 0 && match[3] ? match[3].trim() : title
+        }, (index, match, collection) => {
+            if (index !== 0 && match[3]) collection.push([match[3], ''])
+            if (match[2]) collection.push([match[1], match[2]])
+            return collection
+        })
     };
     const executions = {
         illegal,
