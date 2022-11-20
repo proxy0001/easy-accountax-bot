@@ -5,7 +5,8 @@ function parser (text) {
     const title = matched[1].trim();
     const amount = parseInt(matched[2]);
     const createDatetime = formatDatetime(getLocalTime());
-    return [title, amount, createDatetime]
+    const items = ''
+    return [title, items, amount, createDatetime]
 }
 
 function getLocalTime () {
