@@ -24,4 +24,15 @@ describe('testing our parser', function () {
         expect(title).to.equal('hel23 lo');
         expect(amount).to.equal(100);
     })
-})
+});
+
+describe('support multiple lines', function () {
+    it('should separate title and items correctly and amount is the sum of items', function () {
+        const [title, items, amount, createDatetime] = parser(`tafadsf asf12a
+        it  em   12
+        item2 21`);
+        expect(title).to.equal('tafadsf asf12a');
+        expect(items).to.equal(`it  em 12\nitem2 21`);
+        expect(amount).to.equal(33);
+    })
+});

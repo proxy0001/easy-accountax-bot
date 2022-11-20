@@ -14,7 +14,7 @@ const processor = (function () {
         return []
     };
     const singleLine = function (text) {
-        const matched = text.match(/(.+\D)(\d+) *$/);
+        const matched = text.trim().match(/(.+\D)(\d+) *$/);
         if (!matched) return illegal();
         const title = matched[1].trim();
         const amount = parseInt(matched[2]);
@@ -23,12 +23,19 @@ const processor = (function () {
         return [title, items, amount, createDatetime];
     };
     const multiLines = function (text) {
-        const matched = text.match(/(.+\D)(\d+) *$/);
+        const matched = text.trim().matchAll(/(.+\D)(\d+) *$|(.*[\D^ *]) *$/gm);
         if (!matched) return illegal();
-        const title = matched[1].trim();
-        const amount = parseInt(matched[2]);
+        let title = '', items = '', amount = 0;
+        const elimiter = ' ', newline = '\n';
         const createDatetime = formatDatetime(getLocalTime());
-        const items = '';
+        const collection = []
+        for (const [index, match] of [...matched].entries()) {  
+            if (index === 0 && match[3]) title = match[3].trim()
+            if (index !== 0 && match[3]) collection.push([match[3].trim(), ''])
+            if (match[2]) collection.push([match[1].trim(), match[2].trim()])
+        }
+        amount = collection.reduce((acc, cur) => cur[1] ? acc + parseInt(cur[1]) : acc, 0)
+        items = collection.reduce((acc, cur) => acc ? acc + newline + cur[0] + elimiter + cur[1] : cur[0] + elimiter + cur[1], '')
         return [title, items, amount, createDatetime];
     };
     const executions = {
