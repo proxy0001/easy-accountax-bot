@@ -22,7 +22,7 @@ bot.on("message", async function (event) {
     const sheet = await initGoogleSheet();
     const newRow = await addRecord(sheet, {
         title: data[0],
-        item: data[1],
+        items: data[1],
         amount: data[2],
         createDate: data[3],
     });
