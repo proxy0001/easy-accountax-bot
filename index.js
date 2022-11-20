@@ -22,8 +22,9 @@ bot.on("message", async function (event) {
     const sheet = await initGoogleSheet();
     const newRow = await addRecord(sheet, {
         title: data[0],
-        amount: data[1],
-        createDate: data[2],
+        item: data[1],
+        amount: data[2],
+        createDate: data[3],
     });
     const replyMsg = `Add a record successfully.
 ${data.join(', ')}`
