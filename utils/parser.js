@@ -14,7 +14,7 @@ const processor = (function () {
         return []
     };
     const singleLine = function (text) {
-        const matched = text.match(/(.+\D)(\d+)$/);
+        const matched = text.match(/(.+\D)(\d+) *$/);
         if (!matched) return illegal();
         const title = matched[1].trim();
         const amount = parseInt(matched[2]);
@@ -23,7 +23,7 @@ const processor = (function () {
         return [title, items, amount, createDatetime];
     };
     const multiLines = function (text) {
-        const matched = text.match(/(.+\D)(\d+)$/);
+        const matched = text.match(/(.+\D)(\d+) *$/);
         if (!matched) return illegal();
         const title = matched[1].trim();
         const amount = parseInt(matched[2]);
