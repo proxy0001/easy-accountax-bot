@@ -79,7 +79,7 @@ const processor = (function () {
             return collection
         })
     };
-    const executions = {
+    const executionMethods = {
         illegal,
         oneLineWithEmptyTitle,
         oneLineWithStrictMode,
@@ -87,8 +87,8 @@ const processor = (function () {
         multiLines,
     };
     const exec = function (name) {
-        if (!(executions[name] instanceof Function)) throw new Error('There is no corresponding execution method for the plan.')
-        return executions[name]
+        if (!(executionMethods[name] instanceof Function)) throw new Error('There is no corresponding execution method for the plan.')
+        return executionMethods[name]
     }
     const iterativelyExec = function (plan) {
         return (text) => {
