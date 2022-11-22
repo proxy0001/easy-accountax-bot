@@ -25,6 +25,14 @@ const processor = (function () {
         }
         return matchedLen / matches[0]['input'].replace(/\n/g, '').length
     };
+    const postTransform = function (title, collection) {
+        const condition = collection.length === 1 && title === ''
+        title = condition ? collection[0][0] : title;
+        const items = condition ? '' : collection.reduce(...reduceItemsStr);
+        const amount = collection.reduce(...reduceAmount);
+        const createDatetime = formatDatetime(getLocalTime());
+        return [title, items, amount, createDatetime]
+    }
     const extractor = function (text, regExp, titleHandler, collectionHandler) {
         const matches = [...text.trim().matchAll(regExp)];
         if (!matches.length) return illegal();
@@ -35,10 +43,7 @@ const processor = (function () {
             title = titleHandler(index, trimedMatch, title)
             collection = collectionHandler(index, trimedMatch, collection)
         }
-        const amount = collection.reduce(...reduceAmount);
-        const items = collection.reduce(...reduceItemsStr);
-        const createDatetime = formatDatetime(getLocalTime());
-        return [title, items, amount, createDatetime];
+        return postTransform(title, collection);
     };
     const oneLineWithEmptyTitle = function (text) {
         return extractor(text, /(\D+)(\d+)/gm, (index, match, title) => '', (index, match, collection) => {

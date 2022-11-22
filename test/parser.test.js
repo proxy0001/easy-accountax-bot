@@ -9,15 +9,16 @@ describe('support one line', function () {
 
     it('has empty title and 1 item, should return empty title and 1 item', function () {
         const [title, items, amount, createDatetime] = parser('hello 100');
-        expect(title).to.equal('');
-        expect(items).to.equal('hello 100');
+        console.log(title, items, amount)
+        expect(title).to.equal('hello');
+        expect(items).to.equal('');
         expect(amount).to.equal(100);
     })
 
     it('has empty title and 1 item which has no space between item name and amount, should return empty title and 1 item', function () {
         const [title, items, amount, createDatetime] = parser('hello100');
-        expect(title).to.equal('');
-        expect(items).to.equal('hello 100');
+        expect(title).to.equal('hello');
+        expect(items).to.equal('');
         expect(amount).to.equal(100);
     })
 
