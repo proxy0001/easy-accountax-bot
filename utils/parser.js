@@ -10,8 +10,8 @@ const formatDatetime = function (datetime) {
 };
 
 const elimiter = ' ', newline = '\n';
-const reduceAmount = [(acc, cur) => cur[1] ? acc + parseInt(cur[1]) : acc, 0]
-const reduceItemsStr = [(acc, cur) => acc ? acc + newline + cur[0] + elimiter + cur[1] : cur[0] + elimiter + cur[1], '']
+const reduceAmount = [(acc, cur) => cur[1] ? acc + parseInt(cur[1]) : acc, 0];
+const reduceItemsStr = [(acc, cur) => acc ? acc + newline + cur[0] + elimiter + cur[1] : cur[0] + elimiter + cur[1], ''];
 
 const processor = (function () {
     const illegal = function (text) {
@@ -20,10 +20,8 @@ const processor = (function () {
     const matchCoverage = function (matches) {
         if (matches.length === 0) return 0
         let matchedLen = 0
-        let matchedStr = ''
         for(let i = 0; i < matches.length; i++) {
             matchedLen += matches[i][0].length
-            matchedStr += matches[i][0]
         }
         return matchedLen / matches[0]['input'].replace(/\n/g, '').length
     };
@@ -32,7 +30,7 @@ const processor = (function () {
         if (!matches.length) return illegal();
         if (matchCoverage(matches) !== 1) return illegal();
         let title = '', collection = [];
-        for (const [index, match] of [...matches].entries()) {
+        for (const [index, match] of matches.entries()) {
             trimedMatch = match.map(x => x && typeof x.trim === 'function' ? x.trim() : x)
             title = titleHandler(index, trimedMatch, title)
             collection = collectionHandler(index, trimedMatch, collection)
