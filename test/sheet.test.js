@@ -23,13 +23,14 @@ describe('testing google sheet hanldling',async function () {
 
     it('should add new row correctly',async function () {
         const newRow = await addRecord(sheet, {
-            title: 'hello',
-            amount: 100,
-            createDate: '2011',
+            '店家': 'hello',
+            '品項': '',
+            '金額': 100,
+            '日期': '2011',
         });
-        expect(newRow.title).to.equal('hello');
-        expect(newRow.amount).to.equal('100');
-        expect(newRow.createDate).to.equal('2011');
+        expect(newRow['店家']).to.equal('hello');
+        expect(newRow['金額']).to.equal('100');
+        expect(newRow['日期']).to.equal('2011');
         await newRow.delete();
     }) 
 })
