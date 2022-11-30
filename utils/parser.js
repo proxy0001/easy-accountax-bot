@@ -6,10 +6,10 @@ const getLocalTime = function () {
 };
 
 const formatDatetime = function (datetime) {
-    return datetime.toISOString().slice(0, 19).replace(/-/g, "/").replace("T", " ");
+    return datetime.toISOString().slice(0, 10).replace(/-/g, "/");
 };
 
-const elimiter = ' ', newline = '\n';
+const elimiter = ' ', newline = '、';
 const reduceAmount = [(acc, cur) => cur[1] ? acc + parseInt(cur[1]) : acc, 0];
 const reduceItemsStr = [(acc, cur) => acc ? acc + newline + cur[0] + elimiter + cur[1] : cur[0] + elimiter + cur[1], ''];
 

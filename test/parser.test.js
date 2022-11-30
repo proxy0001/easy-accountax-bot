@@ -25,7 +25,7 @@ describe('support one line', function () {
     it('has empty title and 2 item one has space between item name and amount and another is not, return title and 2 items, sum of amount of each item', function () {
         const [title, items, amount, createDatetime] = parser('goods 100 desk1000');
         expect(title).to.equal('');
-        expect(items).to.equal('goods 100\ndesk 1000');
+        expect(items).to.equal('goods 100、desk 1000');
         expect(amount).to.equal(1100);
     })
 
@@ -46,35 +46,35 @@ describe('support one line', function () {
     it('has title and 2 items all have space between item name and amount, return title and 2 items, sum of amount of each item', function () {
         const [title, items, amount, createDatetime] = parser('shopname goods 100 desk 1000');
         expect(title).to.equal('shopname');
-        expect(items).to.equal('goods 100\ndesk 1000');
+        expect(items).to.equal('goods 100、desk 1000');
         expect(amount).to.equal(1100);
     })
 
     it('has title and 2 items all have no space between item name and amount, return title and 2 items, sum of amount of each item', function () {
         const [title, items, amount, createDatetime] = parser('shopname goods100 desk1000');
         expect(title).to.equal('shopname');
-        expect(items).to.equal('goods 100\ndesk 1000');
+        expect(items).to.equal('goods 100、desk 1000');
         expect(amount).to.equal(1100);
     })
 
     it('has title and 2 items one has space between item name and amount and another is not, return title and 2 items, sum of amount of each item', function () {
         const [title, items, amount, createDatetime] = parser('shopname goods 100 desk1000');
         expect(title).to.equal('shopname');
-        expect(items).to.equal('goods 100\ndesk 1000');
+        expect(items).to.equal('goods 100、desk 1000');
         expect(amount).to.equal(1100);
     })
 
     it('has title and 2 items, one item name has number at the end of name, return title and 2 items, sum of amount of each item', function () {
         const [title, items, amount, createDatetime] = parser('這是店家 東西 12 東西2 12');
         expect(title).to.equal('這是店家');
-        expect(items).to.equal(`東西 12\n東西2 12`);
+        expect(items).to.equal(`東西 12、東西2 12`);
         expect(amount).to.equal(24);
     })
 
     it('has title and 3 items, item names have numbers, return title and 3 items, sum of amount of each item', function () {
         const [title, items, amount, createDatetime] = parser('店家的名字 可樂12 12塊炸雞 120 雞塊*6 120');
         expect(title).to.equal('店家的名字');
-        expect(items).to.equal(`可樂 12\n12塊炸雞 120\n雞塊*6 120`);
+        expect(items).to.equal(`可樂 12、12塊炸雞 120、雞塊*6 120`);
         expect(amount).to.equal(252);
     })
 
@@ -86,7 +86,7 @@ describe('support multiple lines', function () {
         it  em   12
         item2 21`);
         expect(title).to.equal('tafadsf asf12a');
-        expect(items).to.equal(`it  em 12\nitem2 21`);
+        expect(items).to.equal(`it  em 12、item2 21`);
         expect(amount).to.equal(33);
     })
 });
