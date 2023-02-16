@@ -19,8 +19,9 @@ const linebotParser = bot.parser();
 
 
 const sync = async (text) => {
-    const param = text.match(/^\/sync (\d)$/)[1] || undefined
-    const n = parseInt(param) || undefined
+    const param = text.match(/^\/sync (\d)$/)
+    const n = parseInt(param && param[1]) || undefined
+
     try {
         await recordInvoices(n)
     } catch {
@@ -52,7 +53,7 @@ bot.on("message", async function (event) {
     
     let replyMsg = ''
     switch (true) {
-        case /^\/sync/.test(text):
+        case /^\/sync.*$/.test(text):
             replyMsg = await sync(text)
             break
         default:
