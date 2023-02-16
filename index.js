@@ -77,8 +77,8 @@ function initLinebot () {
         channelAccessToken: process.env.LINE_CHANNEL_ACCESS_TOKEN,
     })   
 };
-recordInvoices()
+
 const job = new CronJob('0 0 0 * * *', () => {
     recordInvoices();
-}, null, true);
+});
 job.start();
