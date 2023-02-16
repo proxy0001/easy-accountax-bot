@@ -19,12 +19,14 @@ const linebotParser = bot.parser();
 
 
 const sync = async (text) => {
+    const param = text.match(/^\/sync (\d)$/)[1] || undefined
+    const n = parseInt(param) || undefined
     try {
-        await recordInvoices()
+        await recordInvoices(n)
     } catch {
-        return 'Sync invoice data failed!'
+        return `Sync invoice data ${n} day failed!`
     }
-    return 'Sync invoice data successfully!'
+    return `Sync invoice data ${n} day successfully!`
 }
 
 const parseMsg = async (text) => {
@@ -51,11 +53,10 @@ bot.on("message", async function (event) {
     let replyMsg = ''
     switch (true) {
         case /^\/sync/.test(text):
-            const param = text.match(/^\/sync (\d)$/)[1]
-            replyMsg = await sync(parseInt(param))
+            replyMsg = await sync(text)
             break
         default:
-            replyMsg = await parseMsg(event.message.text)
+            replyMsg = await parseMsg(text)
     }
     event.reply(replyMsg);
 });
