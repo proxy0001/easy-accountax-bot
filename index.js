@@ -2,9 +2,12 @@
 const express = require("express");
 // import linebot SDK
 const linebot = require("linebot");
+const CronJob = require('cron').CronJob;
+
 // import utils
 const parser = require("./utils/parser.js");
-const { initSheet, addRecord } = require("./utils/sheet.js");
+const { sheetHeader, initSheet, addRecord } = require("./utils/sheet.js");
+const { recordInvoices } = require("./utils/invoice.js");
 const app = express();
 
 // load dotenv
@@ -14,20 +17,40 @@ require('dotenv').config();
 const bot = initLinebot();
 const linebotParser = bot.parser();
 
+
+const sync = async (text) => {
+    try {
+        await recordInvoices()
+    } catch {
+        return 'sync invoice data failed!'
+    }
+    return 'sync invoice data successfully!'
+}
+
+const parseMsg = async (text) => {
+    const data = parser(text);
+    const sheet = await initSheet();
+    const newRow = await addRecord(sheet, {
+        [sheetHeader.store]: data[0],
+        [sheetHeader.items]: data[1],
+        [sheetHeader.amount]: data[2],
+        [sheetHeader.date]: data[3],
+    });
+    const replyMsg = `Add a record successfully.
+${data.join(', ')}`
+    
+    return replyMsg
+}
+
 // when someone send msg to bot
 bot.on("message", async function (event) {
     // event.message.text is the msg typing from user
     console.log(event.message.text);
-    const data = parser(event.message.text);
-    const sheet = await initGoogleSheet();
-    const newRow = await addRecord(sheet, {
-        '店家': data[0],
-        '品項': data[1],
-        '金額': data[2],
-        '日期': data[3],
-    });
-    const replyMsg = `Add a record successfully.
-${data.join(', ')}`
+    let replyMsg = ''
+    switch (event.message.text) {
+        case '/sync': replyMsg = await sync()
+        default: replyMsg = await parseMsg(event.message.text)
+    }
     event.reply(replyMsg);
 });
 
@@ -39,22 +62,15 @@ app.listen(process.env.PORT || 3000, () => {
     console.log("Express server start");
 });
 
-
-// initialize google sheet
-async function initGoogleSheet () {
-    const credentials = {
-        client_email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
-        private_key: process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n'),
-    }
-    const docId = process.env.GOOGLE_DOC_ID;
-    const sheetId = process.env.GOOGLE_SHEET_ID;
-    return await initSheet(credentials, docId, sheetId);
-};
-
 function initLinebot () {
     return linebot({
         channelId: process.env.LINE_CHANNEL_ID,
         channelSecret: process.env.LINE_CHANNEL_SECRET,
         channelAccessToken: process.env.LINE_CHANNEL_ACCESS_TOKEN,
     })   
-}
+};
+recordInvoices()
+const job = new CronJob('0 0 0 * * *', () => {
+    recordInvoices();
+}, null, true);
+job.start();
