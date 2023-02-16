@@ -45,11 +45,14 @@ ${data.join(', ')}`
 // when someone send msg to bot
 bot.on("message", async function (event) {
     // event.message.text is the msg typing from user
-    console.log(event.message.text);
+    console.log(event.message.text)
+    const text = event.message.text
+    
     let replyMsg = ''
-    switch (event.message.text) {
-        case '/sync':
-            replyMsg = await sync()
+    switch (true) {
+        case /^\/sync/.test(text):
+            const param = text.match(/^\/sync (\d)$/)[1]
+            replyMsg = await sync(parseInt(param))
             break
         default:
             replyMsg = await parseMsg(event.message.text)
