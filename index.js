@@ -22,9 +22,9 @@ const sync = async (text) => {
     try {
         await recordInvoices()
     } catch {
-        return 'sync invoice data failed!'
+        return 'Sync invoice data failed!'
     }
-    return 'sync invoice data successfully!'
+    return 'Sync invoice data successfully!'
 }
 
 const parseMsg = async (text) => {
@@ -48,8 +48,11 @@ bot.on("message", async function (event) {
     console.log(event.message.text);
     let replyMsg = ''
     switch (event.message.text) {
-        case '/sync': replyMsg = await sync()
-        default: replyMsg = await parseMsg(event.message.text)
+        case '/sync':
+            replyMsg = await sync()
+            break
+        default:
+            replyMsg = await parseMsg(event.message.text)
     }
     event.reply(replyMsg);
 });
