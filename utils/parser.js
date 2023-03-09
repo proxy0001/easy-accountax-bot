@@ -112,7 +112,8 @@ const processor = (function () {
 
 const planner = function (text) {
     if (!text) return 'illegal';
-    if (/\r|\n/.exec(text)) return 'multiLines';
+    if (!/\d+/.test(text)) return 'illegal';
+    if (/\r|\n/.test(text)) return 'multiLines';
     else return ['oneLineWithStrictMode', 'oneLine', 'oneLineWithEmptyTitle'];
 }
 

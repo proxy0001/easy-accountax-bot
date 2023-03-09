@@ -7,11 +7,11 @@ var sheet;
 
 before(async function () {
     const credentials = {
-        client_email: process.env.TEST_GOOGLE_SERVICE_ACCOUNT_EMAIL,
-        private_key: process.env.TEST_GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n'),
+        client_email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
+        private_key: process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n'),
     }
-    const docId = process.env.TEST_GOOGLE_DOC_ID;
-    const sheetId = process.env.TEST_GOOGLE_SHEET_ID;
+    const docId = process.env.GOOGLE_DOC_ID;
+    const sheetId = process.env.GOOGLE_SHEET_ID;
     sheet = await initSheet(credentials, docId, sheetId);
 });
 

@@ -9,7 +9,6 @@ describe('support one line', function () {
 
     it('has empty title and 1 item, should return empty title and 1 item', function () {
         const [title, items, amount, createDatetime] = parser('hello 100');
-        console.log(title, items, amount)
         expect(title).to.equal('hello');
         expect(items).to.equal('');
         expect(amount).to.equal(100);

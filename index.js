@@ -7,6 +7,7 @@ const CronJob = require('cron').CronJob;
 // import utils
 const parser = require("./utils/parser.js");
 const { sheetHeader, initSheet, addRecord } = require("./utils/sheet.js");
+const { receiptMsg } = require("./utils/flexMessage.js");
 const { recordInvoices } = require("./utils/invoice.js");
 const app = express();
 
@@ -17,32 +18,38 @@ require('dotenv').config();
 const bot = initLinebot();
 const linebotParser = bot.parser();
 
+const replyInvoices = (row) => {
+    const sheetData = getRowData(row)
+    const msg = receiptMsg(sheetData)
+    const receivers = process.env.LINE_RECEIVERS.split(' ')
+    bot.push(receivers, msg)
+}
 
-const sync = async (text) => {
+const syncInvoices = async (text) => {
     const param = text.match(/^\/sync (\d)$/)
-    const n = parseInt(param && param[1]) || undefined
+    const days = parseInt(param && param[1]) || undefined
 
     try {
-        await recordInvoices(n)
+        await recordInvoices({ days, callback: replyInvoices})
     } catch {
-        return `Sync invoice data ${n} day failed!`
+        return `Sync invoice data ${days} day failed!`
     }
-    return `Sync invoice data ${n} day successfully!`
+    return `Sync invoice data ${days} day successfully!`
 }
 
 const parseMsg = async (text) => {
     const data = parser(text);
+    if (data.length === 0) return 'Invalid Input';
     const sheet = await initSheet();
-    const newRow = await addRecord(sheet, {
+    const sheetData = {
         [sheetHeader.store]: data[0],
         [sheetHeader.items]: data[1],
         [sheetHeader.amount]: data[2],
         [sheetHeader.date]: data[3],
-    });
-    const replyMsg = `Add a record successfully.
-${data.join(', ')}`
-    
-    return replyMsg
+    };
+    const newRow = await addRecord(sheet, sheetData);
+    const msg = receiptMsg({ ...sheetData, rowNumber: newRow.rowNumber })
+    return msg
 }
 
 // when someone send msg to bot
@@ -54,12 +61,55 @@ bot.on("message", async function (event) {
     let replyMsg = ''
     switch (true) {
         case /^\/sync.*$/.test(text):
-            replyMsg = await sync(text)
+            replyMsg = await syncInvoices(text)
             break
         default:
             replyMsg = await parseMsg(text)
     }
-    event.reply(replyMsg);
+    setTimeout(() => event.reply(replyMsg), 3000)
+    
+});
+
+const checkRow = (row, sheetData) => {
+    const checkCols = [
+        sheetHeader.date,
+        sheetHeader.store,
+        sheetHeader.amount,
+        sheetHeader.invoiceId,
+    ]
+    for (const col of checkCols) {
+        if (sheetData[col] !== row[col]) return false
+    }
+    return true
+}
+
+const getRow = async (sheet, rowNumber) => (await sheet.getRows({ offset: rowNumber - 2, limit: 1}))[0]
+
+const updateRow = async (row, sheetData) => {
+    row[sheetHeader.primaryCategory] = sheetData[sheetHeader.primaryCategory]
+    row[sheetHeader.secondaryCategory] = sheetData[sheetHeader.secondaryCategory]
+    await row.save()
+    return row
+}
+
+const getRowData = (row) => ({
+    ...Object.fromEntries(Object.entries(sheetHeader).map(([k, v]) => [v, row[v] ? row[v] : ''])),
+    rowNumber: row.rowNumber,
+})
+
+bot.on("postback", async function (event) {
+    const params = new URLSearchParams(event.postback.data)
+    const sheetData = Object.fromEntries(params)
+    const sheet = await initSheet()
+    const row = await getRow(sheet, sheetData.rowNumber)
+    
+    if (!checkRow(row, sheetData)) event.reply('Udpate failed, data was not matched.')
+    else {
+        const updatedRow = await updateRow(row, sheetData)
+        const updatedSheetData = getRowData(updatedRow)
+        const msg = receiptMsg(updatedSheetData)
+        event.reply([msg, 'update success'])
+    }
 });
 
 // for line-bot
@@ -79,6 +129,6 @@ function initLinebot () {
 };
 
 const job = new CronJob('0 0 0 * * *', () => {
-    recordInvoices();
+    recordInvoices({ callback: replyInvoices});
 });
 job.start();

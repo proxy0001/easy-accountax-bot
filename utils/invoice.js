@@ -100,7 +100,7 @@ const getInvoiceDetail = async (invNum, invDate, retry = 0) => {
     })
 }
 
-const recordInvoice = async (sheet, invoiceDetail) => {
+const recordInvoice = async (sheet, invoiceDetail, callback) => {
   const items = invoiceDetail.details.reduce((acc, cur, idx) => {
     const name = cur.description
     const quantity = parseInt(cur.quantity) === 1 ? '' : `*${parseInt(cur.quantity)}`
@@ -114,22 +114,25 @@ const recordInvoice = async (sheet, invoiceDetail) => {
     else return acc + cur
   }, ''])
 
-  await addRecord(sheet, {
+  const newRow = await addRecord(sheet, {
     [sheetHeader.store]: invoiceDetail.sellerName, //.split(/(股份有限公司|有限公司)/)[0],
     [sheetHeader.items]: items,
     [sheetHeader.amount]: parseInt(invoiceDetail.amount),
     [sheetHeader.date]: date,
     [sheetHeader.invoiceId]: invoiceDetail.invNum,
   })
+
+  if (typeof callback === 'function') callback(newRow)
 }
 
-const recordInvoices = async (n = DAY_RANGE, retry = 0) => {
+const recordInvoices = async (options) => {
+  const { days = DAY_RANGE, retry = 0, callback } = options
   if (retry > 0) await timeout(TRY_AGAIN_MS)
 
   const sheet = await initSheet()
   const rows = await sheet.getRows()
   
-  const startDate = new Date(Date.now() - n * 24 * 60 * 60 * 1000).toISOString().split('T')[0].replaceAll('-', '/')
+  const startDate = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString().split('T')[0].replaceAll('-', '/')
   const endDate = (new Date()).toISOString().split('T')[0].replaceAll('-', '/')
 
   console.log('start to get invoices')
@@ -143,7 +146,7 @@ const recordInvoices = async (n = DAY_RANGE, retry = 0) => {
       console.log('get invoices error: ', error)
       if (retry < MAX_RETRY) {
         console.log(`retry recordInvoices (${retry + 1})`)
-        return recordInvoices(n, retry + 1)
+        return recordInvoices({ ...options, retry: retry + 1 })
       } else {
         console.log('catch get invoice retry over max error', error)
         throw new Error(error)
@@ -166,12 +169,12 @@ const recordInvoices = async (n = DAY_RANGE, retry = 0) => {
     await getInvoiceDetail(invoice.invNum, invoice.invDate)
       .then(data => {
         console.log('get invoice detail success! ', i)
-        recordInvoice(sheet, data)
+        recordInvoice(sheet, data, callback)
       }).catch(error => {
         console.log('get invoice detail error: ', error, invoice)
         if (retry < MAX_RETRY) {
           console.log(`retry recordInvoices (${retry + 1})`)
-          return recordInvoices(n, retry + 1)
+          return recordInvoices({ ...options, retry: retry + 1 })
         } else {
           console.log('catch get invoice retry over max error', error)
           throw new Error(error)
