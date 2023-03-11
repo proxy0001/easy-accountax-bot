@@ -71,14 +71,15 @@ bot.on("message", async function (event) {
 });
 
 const checkRow = (row, sheetData) => {
-    const checkCols = [
-        sheetHeader.date,
-        sheetHeader.store,
-        sheetHeader.amount,
-        sheetHeader.invoiceId,
-    ]
-    for (const col of checkCols) {
-        if (sheetData[col] !== row[col]) return false
+    const checkConditions = {
+        [sheetHeader.date]: a => b => (new Date(a)).getTime() === (new Date(b)).getTime(),
+        [sheetHeader.store]: a => b => a === b,
+        [sheetHeader.amount]: a => b => a === b,
+        [sheetHeader.invoiceId]: a => b => a === b,
+    }
+    for (const [key, fn] of Object.entries(checkConditions)) {
+        const isOk = fn(sheetData[key])(row[key])
+        if (!isOk) return false
     }
     return true
 }
@@ -102,7 +103,6 @@ bot.on("postback", async function (event) {
     const sheetData = Object.fromEntries(params)
     const sheet = await initSheet()
     const row = await getRow(sheet, sheetData.rowNumber)
-    
     if (!checkRow(row, sheetData)) event.reply('Udpate failed, data was not matched.')
     else {
         const updatedRow = await updateRow(row, sheetData)
