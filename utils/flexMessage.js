@@ -172,29 +172,27 @@ const receiptMsg = (sheetData) => {
   const title = sheetData[sheetHeader.store]
   const date = sheetData[sheetHeader.date]
   const receiptId = ''
-  let contents = []
-  const itemObjs = sheetData[sheetHeader.items].split('、').map(str => {
+  const itemObjs = sheetData[sheetHeader.items] ? sheetData[sheetHeader.items].split('、').map(str => {
     const matches = str.match(/(.+) (-?[\d]+)/)
     return receiptItemObj(matches[1], matches[2])
-  })
-  contents = contents.concat(itemObjs)
-  contents = contents.concat([
-    receiptSeparatorObj(),
-    receiptTopMainItemObj('TOTAL', `${sheetData[sheetHeader.amount]}`),
-  ])
-  let bodyContents = [
-    // receiptTagObj('RECEIPT'),
+  }) : null
+  const totalObj = receiptTopMainItemObj('TOTAL', `${sheetData[sheetHeader.amount]}`)
+  const contents = [
+    ...(itemObjs ? [
+      ...itemObjs,
+      receiptSeparatorObj(),
+    ] : []),
+    totalObj, 
+  ]
+  const bodyContents = [
     receiptTitleObj(title),
     receiptDateObj(date),
-    // receiptSeparatorObj(),
     receiptContentObj(contents),
-  ]
-  if (receiptId.length > 0) {
-    bodyContents = bodyContents.concat([
+    ...(receiptId.length > 0 ? [
       receiptSeparatorObj(),
       receiptNoteItemObj('RECEIPT ID', receiptId),
-    ])
-  }
+    ] : [])
+  ]
   const footerContents = receiptActionsObj(sheetData)
   return {
     "type": "flex",
