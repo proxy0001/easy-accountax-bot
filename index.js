@@ -107,8 +107,9 @@ bot.on("postback", async function (event) {
     else {
         const updatedRow = await updateRow(row, sheetData)
         const updatedSheetData = getRowData(updatedRow)
-        const msg = receiptMsg(updatedSheetData)
-        event.reply([msg, 'update success'])
+        // const msg = receiptMsg(updatedSheetData)
+        const msg = `${updatedSheetData[sheetHeader.store]} is classified as ${updatedSheetData[sheetHeader.primaryCategory]}${updatedSheetData[sheetHeader.secondaryCategory] !== '' ? '-' + updatedSheetData[sheetHeader.secondaryCategory] : ''}`
+        event.reply(msg)
     }
 });
 
@@ -125,7 +126,7 @@ function initLinebot () {
         channelId: process.env.LINE_CHANNEL_ID,
         channelSecret: process.env.LINE_CHANNEL_SECRET,
         channelAccessToken: process.env.LINE_CHANNEL_ACCESS_TOKEN,
-    })   
+    })
 };
 
 const job = new CronJob('0 0 0 * * *', () => {
