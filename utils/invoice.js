@@ -129,11 +129,8 @@ const recordInvoices = async (options) => {
   const { days = DAY_RANGE, retry = 0, callback } = options
   if (retry > 0) await timeout(TRY_AGAIN_MS)
 
-  const sheet = await initSheet()
-  const rows = await sheet.getRows()
-  
-  const startDate = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString().split('T')[0].replaceAll('-', '/')
-  const endDate = (new Date()).toISOString().split('T')[0].replaceAll('-', '/')
+  const startDate = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString().split('T')[0].replace(/-/g, '/')
+  const endDate = (new Date()).toISOString().split('T')[0].replace(/-/g, '/')
 
   console.log('start to get invoices')
   await timeout(WAIT_MS)
@@ -157,6 +154,10 @@ const recordInvoices = async (options) => {
   console.log('start to check that are invoices recorded: ', invoices.length)
   let countRecorded = 0
   for (let i = 0;i < invoices.length; i++) {
+    // make sure sheet data is latest
+    const sheet = await initSheet()
+    const rows = await sheet.getRows()
+
     const invoice = invoices[i]
     const isRecorded = rows.findIndex(row => row[sheetHeader.invoiceId] === invoice.invNum) > -1
     console.log('isRecorded', isRecorded)
