@@ -5,6 +5,7 @@ const linebot = require("linebot");
 const CronJob = require('cron').CronJob;
 
 // import utils
+const chatGpt = require("./utils/chatGpt.js")
 const parser = require("./utils/parser.js");
 const { sheetHeader, initSheet, addRecord } = require("./utils/sheet.js");
 const { receiptMsg } = require("./utils/flexMessage.js");
@@ -52,6 +53,11 @@ const parseMsg = async (text) => {
     return msg
 }
 
+const chatId = (source) => {
+    if (source?.type === 'group') return `group:${source.groupId}`
+    if (source?.type === 'user') return `user:${source.userId}`
+}
+
 // when someone send msg to bot
 bot.on("message", async function (event) {
     // event.message.text is the msg typing from user
@@ -64,7 +70,8 @@ bot.on("message", async function (event) {
             replyMsg = await syncInvoices(text)
             break
         default:
-            replyMsg = await parseMsg(text)
+            replyMsg = await chatGpt.talkWith(chatId(event.source))(text)
+            // replyMsg = await parseMsg(text)
     }
     setTimeout(() => event.reply(replyMsg), 3000)
     
