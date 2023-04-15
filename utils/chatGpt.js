@@ -9,7 +9,7 @@ const configuration = new Configuration({
 const openai = new OpenAIApi(configuration);
 
 const memory = {}
-const memorySize = 100
+const memorySize = parseInt(process.env.CHAT_MEMORY_SIZE) || 20
 const gptModel = 'gpt-3.5-turbo'
 const gptMaxTokens = parseInt(process.env.OPENAI_MAX_TOKENS) || 200
 
