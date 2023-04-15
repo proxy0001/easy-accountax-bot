@@ -28,9 +28,9 @@ const talkWith = chatId => async text => {
       messages: memory[chatId],
       max_tokens: gptMaxTokens,
     })
-    const response = data.choices[0]
+    const response = data.choices[0].message
     remember(chatId)(response)
-    return response.message.content
+    return response.content
   } catch (error) {
     if (error.response) {
       console.log(error.response.status, error.response.message)
