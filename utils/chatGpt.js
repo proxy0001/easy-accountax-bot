@@ -33,8 +33,10 @@ const talkWith = chatId => async text => {
     return response.message.content
   } catch (error) {
     if (error.response) {
-      return `${error.response.status} ${error.response.statusText}`
+      console.log(error.response.status, error.response.message)
+      return `${error.response.status} ${error.response.statusText}\r\n${error.response.message}`
     } else {
+      console.log(error)
       return error.message
     }
   }
