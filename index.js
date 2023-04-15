@@ -124,7 +124,7 @@ bot.on("postback", async function (event) {
 app.post("/", linebotParser);
 
 // execute server
-app.listen(process.env.PORT || 3000, () => {
+app.listen(process.env.PORT || 3001, () => {
     console.log("Express server start");
 });
 

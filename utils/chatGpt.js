@@ -11,7 +11,7 @@ const openai = new OpenAIApi(configuration);
 const memory = {}
 const memorySize = 100
 const gptModel = 'gpt-3.5-turbo'
-const gptMaxTokens = 500
+const gptMaxTokens = parseInt(process.env.OPENAI_MAX_TOKENS) || 200
 
 const remember = chatId => dialogue => {
   memory[chatId] = memory[chatId] === undefined ? [] : memory[chatId]
@@ -28,10 +28,9 @@ const talkWith = chatId => async text => {
       messages: memory[chatId],
       max_tokens: gptMaxTokens,
     })
-    console.log('chat response', data)
-    const response = data.choices[0].message.content.trim()
-    remember(chatId)({ role: 'system', content: response })
-    return response
+    const response = data.choices[0]
+    remember(chatId)(response)
+    return response.message.content
   } catch (error) {
     if (error.response) {
       return `${error.response.status} ${error.response.statusText}`
