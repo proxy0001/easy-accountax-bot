@@ -27,20 +27,33 @@ const replyInvoices = (row) => {
 }
 
 const syncInvoices = async (text) => {
+    if (!/^\/sync.*$/.test(text)) return {
+        hasResult: false,
+        msg: `Illegal commands`,
+    }
     const param = text.match(/^\/sync (\d)$/)
     const days = parseInt(param && param[1]) || undefined
 
     try {
         await recordInvoices({ days, callback: replyInvoices})
-    } catch {
-        return `Sync invoice data ${days} day failed!`
+    } catch (error) {
+        return {
+            hasResult: false,
+            msg: `Sync invoice data ${days} day failed!`,
+        }
     }
-    return `Sync invoice data ${days} day successfully!`
+    return {
+        hasResult: true,
+        msg: `Sync invoice data ${days} day successfully!`
+    }
 }
 
-const parseMsg = async (text) => {
+const parseAccounting = async (text) => {
     const data = parser(text);
-    if (data.length === 0) return 'Invalid Input';
+    if (data.length === 0) return {
+        hasResult: false,
+        msg: 'Invalid Input',
+    };
     const sheet = await initSheet();
     const sheetData = {
         [sheetHeader.store]: data[0],
@@ -50,7 +63,27 @@ const parseMsg = async (text) => {
     };
     const newRow = await addRecord(sheet, sheetData);
     const msg = receiptMsg({ ...sheetData, rowNumber: newRow.rowNumber })
-    return msg
+    return {
+        hasResult: true,
+        msg: msg,
+    }
+}
+
+const chat = (chatId) => async (text) => {
+    const msg = await chatGpt.talkWith(chatId)(text)
+    return {
+        hasResult: true,
+        msg: msg,
+    }
+}
+
+const excutor = async (text, ...fns) => {
+    for (fn of fns) {
+        const { hasResult, result, msg } = await fn(text)
+        if (hasResult) return msg
+        else continue
+    }
+    return `Sorry, I can't answer your question.`
 }
 
 const chatId = (source) => {
@@ -62,19 +95,13 @@ const chatId = (source) => {
 bot.on("message", async function (event) {
     // event.message.text is the msg typing from user
     console.log(event.message.text)
-    const text = event.message.text
-    
-    let replyMsg = ''
-    switch (true) {
-        case /^\/sync.*$/.test(text):
-            replyMsg = await syncInvoices(text)
-            break
-        default:
-            replyMsg = await chatGpt.talkWith(chatId(event.source))(text)
-            // replyMsg = await parseMsg(text)
-    }
-    setTimeout(() => event.reply(replyMsg), 3000)
-    
+    const replyMsg = await excutor(
+        event.message.text,
+        syncInvoices,
+        parseAccounting,
+        chat(chatId(event.source)),
+    )
+    event.reply(replyMsg)
 });
 
 const checkRow = (row, sheetData) => {
