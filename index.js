@@ -164,6 +164,6 @@ function initLinebot () {
 };
 
 const job = new CronJob('0 0 0 * * *', () => {
-    recordInvoices({ callback: replyInvoices});
+    recordInvoices({ callback: replyInvoices}).catch(error => console.error(error));
 });
 job.start();
